@@ -87,7 +87,8 @@ async function buildJs() {
 
   const config = {
     ...esbuildCommon,
-    plugins: [vue()],
+    // Production compile drops `__file` (absolute source paths) so release bundles are reproducible.
+    plugins: [vue({ isProduction: isRelease })],
     entryPoints,
     outdir: outDir
   };

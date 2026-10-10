@@ -122,6 +122,17 @@ tests/e2e/            Selenium runner and local test site
 tests/harness/        test-only extension page (built into dist-test only)
 ```
 
+### Reproducing the release package (AMO review)
+
+Requirements: Windows, macOS, or Linux; Node.js 20 or later (built with 24.18.0) and the npm bundled with it (built with npm 12.0.2). No other tools are needed; all build dependencies are pinned in `package-lock.json`.
+
+```bash
+npm ci
+npm run build:release
+```
+
+`dist/` then contains exactly the files of the submitted package (`release/session-copy-firefox-v<version>.zip`). `npm run package` performs the same build, runs `web-ext lint`, and writes that zip. The build script is `scripts/build.mjs` (esbuild bundles `src/background.js`, `src/popup/main.ts`, and `src/import/main.ts`; Vue single-file components are compiled by `unplugin-vue`; popup CSS is `@makogai/extension-brand/popup.css` followed by `src/popup/app.css`).
+
 ### Tests
 
 - **Unit** — token and file round-trips, decoding of tokens and files produced by the Chrome version, and cookie restore rules (`__Host-`, host-only, `sameSite`, target cookie store).

@@ -31,6 +31,7 @@ The token (`sc:v2:…`) and `.session` formats are identical to the Chrome versi
 - **Export / Import** an encrypted `.session` file (used automatically for large sessions).
 - **Login transfer mode** (default) — copies only authentication-related cookies and storage keys. Full sync is available in Settings.
 - **Container tabs and private windows** — sessions are read from and restored into the active tab's own cookie store.
+- **First-party isolation** — works with `privacy.firstparty.isolate` enabled.
 - **Clear site data** — removes cookies, localStorage, and sessionStorage for the active site.
 - Light, dark, and system themes.
 
@@ -118,7 +119,7 @@ src/utils/            crypto helpers and capture filters
 src/popup/            toolbar popup (Vue 3 + TypeScript)
 src/import/           import page
 tests/unit/           node:test suites and Chrome-generated fixtures
-tests/e2e/            Selenium runner and local test site
+tests/e2e/            Selenium suites (core flows, real popup, first-party isolation) and local test site
 tests/harness/        test-only extension page (built into dist-test only)
 ```
 
@@ -136,12 +137,16 @@ npm run build:release
 ### Tests
 
 - **Unit** — token and file round-trips, decoding of tokens and files produced by the Chrome version, and cookie restore rules (`__Host-`, host-only, `sameSite`, target cookie store).
-- **End-to-end** — launches the installed Firefox with a fresh temporary profile, installs a test build, and verifies capture, clipboard, file export, site cleanup, restore against a local site (including the HttpOnly session cookie reaching the server), container isolation, and popup/import rendering. Set `HEADED=1` to show the browser window. If Firefox has a downloaded update pending, launching it applies that update.
+- **End-to-end** (`npm run test:e2e`) — launches the installed Firefox with fresh temporary profiles and a test build of the add-on, against a local test site:
+  - `tests/e2e/run.mjs`: capture, clipboard, file export, site cleanup, restore (including the HttpOnly session cookie reaching the server), container and private-window isolation, popup/import rendering.
+  - `tests/e2e/popup.mjs`: the real toolbar popup — Copy, Clear, Paste, Export, Import, and the website-access prompt. This suite runs extensions in-process (`extensions.webextensions.remote=false`) so it can operate inside the popup.
+  - `tests/e2e/fpi.mjs`: capture, cleanup, and restore with first-party isolation enabled.
+
+  Set `HEADED=1` to show the browser window. If Firefox has a downloaded update pending, launching it applies that update.
 
 ## Limitations
 
 - IndexedDB, Cache Storage, and service worker caches are not exported.
-- Cookie restore may fail when first-party isolation (`privacy.firstparty.isolate`) is enabled.
 - Partitioned (CHIPS) cookies are not captured.
 - Sites that bind sessions to a device, IP address, or IndexedDB state may only be partially restored.
 - Firefox for Android is not supported.

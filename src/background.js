@@ -47,6 +47,27 @@ function navigateAndWait(tabId, trigger) {
   });
 }
 
+/**
+ * First-party isolation (privacy.firstparty.isolate) requires every cookie write to name the
+ * site's firstPartyDomain, which only Firefox computes. Let the loaded page set a short-lived
+ * probe cookie, read the firstPartyDomain Firefox gave it, then delete the probe.
+ * @returns {Promise<string | undefined>}
+ */
+async function probeFirstPartyDomain(tabId, originNorm, storeId) {
+  const name = `__session_copy_probe_${Date.now()}`;
+  await browser.scripting.executeScript({
+    target: { tabId },
+    args: [name],
+    func: n => {
+      document.cookie = `${n}=1; path=/; max-age=60`;
+    }
+  });
+  const [probe] = await browser.cookies.getAll({ url: originNorm, name, storeId, firstPartyDomain: null });
+  if (!probe) return undefined;
+  await browser.cookies.remove({ url: `${originNorm}/`, name, storeId, firstPartyDomain: probe.firstPartyDomain });
+  return probe.firstPartyDomain;
+}
+
 /** Inject localStorage + sessionStorage only (cookies via the cookies API). */
 function injectStorageIntoTab(tabId, data) {
   return browser.scripting.executeScript({
@@ -96,11 +117,15 @@ async function openAndRestore(data, target = {}) {
   const storeId = tab.cookieStoreId;
 
   // Cookies first, so the very first request to the site already carries the session.
-  await applyCookiesToOrigin(originNorm, cookies, storeId);
+  const early = await applyCookiesToOrigin(originNorm, cookies, storeId);
   await navigateAndWait(tabId, () => browser.tabs.update(tabId, { url: originNorm }));
 
+  const firstPartyDomain = early.needsFirstPartyDomain
+    ? await probeFirstPartyDomain(tabId, originNorm, storeId).catch(() => undefined)
+    : undefined;
+
   // The first page load may have rotated or cleared cookies — apply again, then storage.
-  const { set, failed } = await applyCookiesToOrigin(originNorm, cookies, storeId);
+  const { set, failed } = await applyCookiesToOrigin(originNorm, cookies, storeId, firstPartyDomain);
   await injectStorageIntoTab(tabId, data);
 
   // Second navigation so NextAuth / SPA re-reads cookies + storage (critical for ChatGPT).

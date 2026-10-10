@@ -80,3 +80,9 @@ test('target storeId (container / private window) is applied, never the source o
 test('nameless cookies are skipped', () => {
   assert.equal(buildCookieSetDetails('https://e.com', { ...base, name: '' }), null);
 });
+
+test('firstPartyDomain is passed through when first-party isolation needs it', () => {
+  assert.equal(buildCookieSetDetails('https://e.com', { ...base, name: 'a' }, undefined, 'e.com').firstPartyDomain, 'e.com');
+  assert.equal(buildCookieSetDetails('https://e.com', { ...base, name: 'a' }, undefined, '').firstPartyDomain, '');
+  assert.equal('firstPartyDomain' in buildCookieSetDetails('https://e.com', { ...base, name: 'a' }), false);
+});

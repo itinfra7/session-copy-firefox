@@ -8,9 +8,10 @@ const FIREFOX_SAME_SITE = new Set(['no_restriction', 'lax', 'strict']);
  * @param {string} originNorm
  * @param {import('./cookie-snapshot.js').CookieSnapshot} snap
  * @param {string} [storeId] target cookie store (tab.cookieStoreId)
+ * @param {string} [firstPartyDomain] required by Firefox when first-party isolation is on
  * @returns {browser.cookies._SetDetails | null}
  */
-export function buildCookieSetDetails(originNorm, snap, storeId) {
+export function buildCookieSetDetails(originNorm, snap, storeId, firstPartyDomain) {
   const name = snap.name || '';
   if (!name) return null;
 
@@ -50,6 +51,7 @@ export function buildCookieSetDetails(originNorm, snap, storeId) {
   }
 
   if (storeId) details.storeId = storeId;
+  if (firstPartyDomain != null) details.firstPartyDomain = firstPartyDomain;
 
   return details;
 }
@@ -58,9 +60,11 @@ export function buildCookieSetDetails(originNorm, snap, storeId) {
  * @param {string} origin Page origin e.g. https://chatgpt.com
  * @param {import('./cookie-snapshot.js').CookieSnapshot[]} snapshots
  * @param {string} [storeId] target cookie store (tab.cookieStoreId)
- * @returns {Promise<{ set: number; failed: number }>}
+ * @param {string} [firstPartyDomain] required by Firefox when first-party isolation is on
+ * @returns {Promise<{ set: number; failed: number; needsFirstPartyDomain: boolean }>}
+ *   needsFirstPartyDomain: a write was refused because first-party isolation is on.
  */
-export async function applyCookiesToOrigin(origin, snapshots, storeId) {
+export async function applyCookiesToOrigin(origin, snapshots, storeId, firstPartyDomain) {
   let originNorm;
   try {
     originNorm = new URL(origin).origin;
@@ -71,13 +75,14 @@ export async function applyCookiesToOrigin(origin, snapshots, storeId) {
   const seen = new Set();
   let set = 0;
   let failed = 0;
+  let needsFirstPartyDomain = false;
 
   for (const snap of snapshots) {
     const key = `${snap.name}\0${snap.domain || ''}\0${snap.path || '/'}`;
     if (seen.has(key)) continue;
     seen.add(key);
 
-    const details = buildCookieSetDetails(originNorm, snap, storeId);
+    const details = buildCookieSetDetails(originNorm, snap, storeId, firstPartyDomain);
     if (!details) {
       failed++;
       continue;
@@ -89,9 +94,10 @@ export async function applyCookiesToOrigin(origin, snapshots, storeId) {
       else failed++;
     } catch (e) {
       failed++;
+      if (/firstPartyDomain/.test(e?.message || '')) needsFirstPartyDomain = true;
       console.warn('[session-copy] cookie set failed', snap.name, e?.message || e);
     }
   }
 
-  return { set, failed };
+  return { set, failed, needsFirstPartyDomain };
 }

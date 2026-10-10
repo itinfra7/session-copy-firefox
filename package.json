@@ -1,6 +1,6 @@
 {
   "name": "session-copy-firefox",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Firefox port of Session Copy — copy and restore encrypted login sessions for any website",
   "author": "itinfra7 (https://github.com/itinfra7)",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "sign": "web-ext sign --source-dir dist --artifacts-dir release --channel unlisted",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "node --test \"tests/unit/*.test.mjs\"",
-    "test:e2e": "npm run build:test && node tests/e2e/run.mjs"
+    "test:e2e": "npm run build:test && node tests/e2e/run.mjs && node tests/e2e/popup.mjs && node tests/e2e/fpi.mjs"
   },
   "dependencies": {
     "@makogai/extension-brand": "^1.0.1",

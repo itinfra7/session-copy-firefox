@@ -1,0 +1,10 @@
+{
+  "version": "2.3.2",
+  "date": "2026-10-10",
+  "title": "Firefox edition 2.3.2",
+  "changes": [
+    "Restoring a session now works with first-party isolation (privacy.firstparty.isolate) enabled.",
+    "Release bundles are reproducible from source and no longer embed local build paths.",
+    "New end-to-end tests for the real toolbar popup and for private windows."
+  ]
+}

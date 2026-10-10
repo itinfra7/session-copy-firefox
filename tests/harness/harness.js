@@ -55,20 +55,26 @@ window.sc = {
   async clear(tabId) {
     return clearSiteData(tabToSite(await browser.tabs.get(tabId)), {});
   },
-  async restore(session, cookieStoreId) {
+  async restore(session, cookieStoreId, windowId) {
     const current = await browser.tabs.getCurrent();
     const before = new Set((await browser.tabs.query({})).map(t => t.id));
     const resp = await browser.runtime.sendMessage({
       action: 'openAndRestore',
       data: session,
-      target: { windowId: current.windowId, cookieStoreId }
+      target: { windowId: windowId ?? current.windowId, cookieStoreId }
     });
     const created = (await browser.tabs.query({})).filter(t => !before.has(t.id));
     return { resp, tabIds: created.map(t => t.id) };
   },
   async cookies(url, storeId) {
     const list = await browser.cookies.getAll({ url, storeId, firstPartyDomain: null });
-    return list.map(c => ({ name: c.name, value: c.value, httpOnly: c.httpOnly, hostOnly: c.hostOnly }));
+    return list.map(c => ({
+      name: c.name,
+      value: c.value,
+      httpOnly: c.httpOnly,
+      hostOnly: c.hostOnly,
+      firstPartyDomain: c.firstPartyDomain
+    }));
   },
   async hostAccess() {
     return browser.permissions.contains({ origins: ['http://*/*', 'https://*/*'] });
@@ -79,6 +85,34 @@ window.sc = {
   async focusSelf() {
     const current = await browser.tabs.getCurrent();
     await browser.tabs.update(current.id, { active: true });
+  },
+  async readClipboard() {
+    return navigator.clipboard.readText();
+  },
+  async unpack(token) {
+    return unpackFromClipboardString(token);
+  },
+  /** Opens the toolbar popup of the current window (needs extensions.openPopupWithoutUserGesture.enabled). */
+  async openPopup() {
+    await browser.action.openPopup();
+  },
+  async activeTab() {
+    const [t] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
+    return { id: t.id, url: t.url, cookieStoreId: t.cookieStoreId, windowId: t.windowId };
+  },
+  async findTabs(urlPattern) {
+    return (await browser.tabs.query({ url: urlPattern })).map(t => ({ id: t.id, url: t.url, cookieStoreId: t.cookieStoreId, windowId: t.windowId }));
+  },
+  async removeHostAccess() {
+    return browser.permissions.remove({ origins: ['http://*/*', 'https://*/*'] });
+  },
+  async openPrivateWindow(url) {
+    const win = await browser.windows.create({ incognito: true, url: 'about:blank' });
+    const tabId = win.tabs[0].id;
+    const done = waitComplete(tabId);
+    await browser.tabs.update(tabId, { url });
+    await done;
+    return { windowId: win.id, tabId };
   }
 };
 

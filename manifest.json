@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "Session Copy",
+  "name": "Session Copy for Firefox",
   "description": "Copy and restore encrypted login sessions for any website. Offline, private, and built for secure transfer between browsers.",
   "version": "0.0.0",
   "author": "itinfra7",
   "homepage_url": "https://github.com/itinfra7/session-copy-firefox",
   "browser_specific_settings": {
     "gecko": {
-      "id": "{67935ecc-b8f8-4540-8783-3a3553287b74}",
+      "id": "session-copy-firefox@itinfra7",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": [

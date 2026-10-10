@@ -65,7 +65,7 @@ npm run build:release
 npm run sign
 ```
 
-The signed `.xpi` is written to `release/`; open it in Firefox to install. Before the first signing, you may replace `browser_specific_settings.gecko.id` in `manifest.json` with your own add-on ID; keep it unchanged afterwards.
+The signed `.xpi` is written to `release/`; open it in Firefox to install. The add-on ID is `session-copy-firefox@itinfra7`; forks that sign their own builds must use a different ID.
 
 Firefox Developer Edition and Nightly can install the unsigned package from `npm run package` when `xpinstall.signatures.required` is set to `false` in `about:config`.
 

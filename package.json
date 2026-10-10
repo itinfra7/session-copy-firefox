@@ -1,0 +1,48 @@
+{
+  "name": "session-copy-firefox",
+  "version": "2.3.1",
+  "description": "Firefox port of Session Copy — copy and restore encrypted login sessions for any website",
+  "author": "itinfra7 (https://github.com/itinfra7)",
+  "license": "MIT",
+  "homepage": "https://github.com/itinfra7/session-copy-firefox#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itinfra7/session-copy-firefox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itinfra7/session-copy-firefox/issues"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "node scripts/clean.mjs dist dist-test release",
+    "build": "node scripts/build.mjs",
+    "build:release": "node scripts/build.mjs --release",
+    "build:test": "node scripts/build.mjs --test",
+    "dev": "node scripts/build.mjs --watch",
+    "start": "web-ext run --source-dir dist",
+    "lint": "web-ext lint --source-dir dist",
+    "package": "npm run build:release && npm run lint && web-ext build --source-dir dist --artifacts-dir release --filename session-copy-firefox-v{version}.zip --overwrite-dest",
+    "sign": "web-ext sign --source-dir dist --artifacts-dir release --channel unlisted",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:e2e": "npm run build:test && node tests/e2e/run.mjs"
+  },
+  "dependencies": {
+    "@makogai/extension-brand": "^1.0.1",
+    "vue": "^3.5.34"
+  },
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^143.0.1",
+    "esbuild": "^0.25.0",
+    "fs-extra": "^11.3.0",
+    "selenium-webdriver": "^4.30.0",
+    "typescript": "^5.8.3",
+    "unplugin-vue": "^7.2.0",
+    "vue-tsc": "^2.2.10",
+    "web-ext": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

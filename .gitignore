@@ -1,0 +1,9 @@
+dist/
+dist-test/
+release/
+node_modules/
+.web-extension-id
+.amo-upload-uuid
+.DS_Store
+Thumbs.db
+test-results/

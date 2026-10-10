@@ -1,0 +1,11 @@
+{
+  "version": "2.3.1",
+  "date": "2026-10-10",
+  "title": "Firefox edition",
+  "changes": [
+    "Runs on Firefox 140+ as a Manifest V3 add-on (event page background, browser.* APIs).",
+    "Container tabs and private windows: sessions are read from and restored into the active tab's own cookie store.",
+    "Import opens in a tab, because Firefox closes the toolbar popup when a file picker opens.",
+    "Same encrypted token and .session file format as the Chrome version, so sessions move between both browsers."
+  ]
+}

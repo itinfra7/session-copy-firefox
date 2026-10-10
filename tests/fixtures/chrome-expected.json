@@ -1,0 +1,31 @@
+{
+  "origin": "https://example.test",
+  "createdAt": 1760000000000,
+  "localStorage": {
+    "access_token": "fixture-access-token"
+  },
+  "sessionStorage": {
+    "csrf_token": "fixture-csrf"
+  },
+  "cookies": [
+    {
+      "name": "sessionid",
+      "value": "fixture-session",
+      "domain": "example.test",
+      "path": "/",
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "lax",
+      "expirationDate": 1900000000
+    },
+    {
+      "name": "__Host-next-auth.csrf-token",
+      "value": "fixture-host",
+      "domain": "example.test",
+      "path": "/",
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "unspecified"
+    }
+  ]
+}

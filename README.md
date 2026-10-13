@@ -10,6 +10,11 @@
 </p>
 
 <p align="center">
+  <a href="https://addons.mozilla.org/firefox/addon/session-copy-for-firefox/"><strong>Get the add-on for Firefox</strong></a>
+</p>
+
+<p align="center">
+  <a href="https://addons.mozilla.org/firefox/addon/session-copy-for-firefox/"><img src="https://img.shields.io/amo/v/session-copy-for-firefox?label=addons.mozilla.org&logo=firefoxbrowser&logoColor=white" alt="addons.mozilla.org version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/Firefox-140%2B-FF7139?logo=firefoxbrowser&logoColor=white" alt="Firefox 140+" />
   <img src="https://img.shields.io/badge/manifest-v3-555" alt="Manifest V3" />
@@ -37,6 +42,12 @@ The token (`sc:v2:…`) and `.session` formats are identical to the Chrome versi
 
 ## Installation
 
+### From addons.mozilla.org
+
+Install [Session Copy for Firefox](https://addons.mozilla.org/firefox/addon/session-copy-for-firefox/) from addons.mozilla.org (Firefox 140 or later). Updates are delivered automatically.
+
+The Mozilla-signed `.xpi` is also attached to the [GitHub releases](https://github.com/itinfra7/session-copy-firefox/releases).
+
 ### Build from source
 
 Requires Node.js 20 or later.
@@ -55,9 +66,9 @@ npm run build
 
 The add-on stays loaded until Firefox restarts. `npm run start` launches a separate Firefox profile with the add-on loaded and auto-reloaded.
 
-### Install permanently
+### Sign your own build
 
-Release and ESR builds of Firefox only install add-ons signed by Mozilla. Sign an unlisted build with your [AMO API credentials](https://addons.mozilla.org/developers/addon/api/key/):
+Release and ESR builds of Firefox only install add-ons signed by Mozilla. To install a modified build permanently, sign it as an unlisted add-on with your own [AMO API credentials](https://addons.mozilla.org/developers/addon/api/key/):
 
 ```bash
 export WEB_EXT_API_KEY="user:00000000:000"
